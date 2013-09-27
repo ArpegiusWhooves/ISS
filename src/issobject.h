@@ -14,7 +14,6 @@ class ISSObject : public QObject
 
     Q_ENUMS( SomeEnum )
 
-
 public:
     explicit ISSObject(QObject *parent = 0);
 

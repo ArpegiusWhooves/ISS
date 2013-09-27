@@ -7,6 +7,10 @@
 
 class QNetworkAccessManager;
 
+class NetworkService;
+
+class ISSObject;
+
 class ISService : public QObject
 {
     Q_OBJECT
@@ -29,6 +33,8 @@ public:
     }
 
 
+    void addObject( ISSObject* obj );
+
 signals:
     
 
@@ -37,14 +43,19 @@ public slots:
 
 
 
+
 private:
+
+    QNetworkAccessManager *network_manager;
+
+    QList< NetworkService* > network_services;
+
+    QMap< long, ISSObject* > objects;
 
     static void data_append(QQmlListProperty<QObject> *property, QObject *value);
     static int data_count(QQmlListProperty<QObject> *property);
     static QObject *data_at(QQmlListProperty<QObject> *property, int index);
     static void data_clear(QQmlListProperty<QObject> *property);
-
-    QNetworkAccessManager *network_manager;
 
 };
 

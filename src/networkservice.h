@@ -3,8 +3,12 @@
 
 #include <QObject>
 
+#include<QMap>
+#include<QVariantMap>
 
 class QNetworkAccessManager;
+class QNetworkReply;
+class QSignalMapper;
 
 class NetworkService : public QObject
 {
@@ -18,11 +22,19 @@ public:
     void setManager(QNetworkAccessManager *value);
 
 signals:
-    
+        void objectReady( int request, QVariantMap object );
+
 public slots:
 
-private:
+protected:
+
+    int addReply( QNetworkReply* );
+
     QNetworkAccessManager* manager;
+
+    QSignalMapper* replyMapper;
+    QMap< int, QNetworkReply* > replies;
+    int requestCount;
     
 };
 

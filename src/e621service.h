@@ -2,7 +2,12 @@
 #define E621SERVICE_H
 
 #include "networkservice.h"
-#include <QIODevice>
+
+#include <QString>
+#include <QVariantMap>
+#include <QStringList>
+
+class QNetworkReply;
 
 class E621Service : public NetworkService
 {
@@ -11,17 +16,21 @@ class E621Service : public NetworkService
 public:
     explicit E621Service(QObject *parent = 0);
 
-       QIODevice getObject( QString id );
-       void getObject( QString hash );
+//       int requestImageInfoByFileMD5( QString md5 );
+//       int requestImageInfoById( QString id );
+       Q_INVOKABLE int requestImageInfoByTags( QStringList tags, int beforeId = -1 );
 
-       getImage( QVariant id );
-    
 signals:
-    
-       void objectReady( QVariantMap object );
 
+    
 public slots:
     
+private slots:
+    void replyFinish(int map);
+
+private:
+
 };
 
 #endif // E621SERVICE_H
+
