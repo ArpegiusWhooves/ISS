@@ -9,12 +9,12 @@
 
 class QNetworkReply;
 
-class E621Service : public NetworkService
+class OuroborosService : public NetworkService
 {
     Q_OBJECT
 
 public:
-    explicit E621Service(QObject *parent = 0);
+    explicit OuroborosService(QObject *parent = 0);
 
 //       int requestImageInfoByFileMD5( QString md5 );
 //       int requestImageInfoById( QString id );

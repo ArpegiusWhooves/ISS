@@ -63,7 +63,7 @@ Rectangle {
     {
         id: i1
 
-        E621Service
+        OuroborosService
         {
 
             id:service1

@@ -1,4 +1,4 @@
-#include "e621service.h"
+#include "ouroborosservice.h"
 
 
 #include <QNetworkAccessManager>
@@ -13,14 +13,14 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-E621Service::E621Service(QObject *parent) :
+OuroborosService::OuroborosService(QObject *parent) :
     NetworkService(parent)
 {
     connect(replyMapper, SIGNAL(mapped(int)),
                 this, SLOT(replyFinish(int)));
 }
 
-int E621Service::requestImageInfoByTags( QStringList tags, int beforeId )
+int OuroborosService::requestImageInfoByTags( QStringList tags, int beforeId )
 {
     QString args;
 
@@ -38,7 +38,7 @@ int E621Service::requestImageInfoByTags( QStringList tags, int beforeId )
 
 }
 
-void E621Service::replyFinish(int map)
+void OuroborosService::replyFinish(int map)
 {
     QNetworkReply *r= replies[map];
     if( r->error() == QNetworkReply::NoError )

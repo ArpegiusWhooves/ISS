@@ -15,8 +15,8 @@ QML_IMPORT_PATH =
 SOURCES += src/main.cpp \
     src/networkservice.cpp \
     src/issobject.cpp \
-    src/e621service.cpp \
-    src/isservice.cpp
+    src/isservice.cpp \
+    src/ouroborosservice.cpp
 
 # Installation path
 # target.path =
@@ -28,5 +28,5 @@ qtcAddDeployment()
 HEADERS += \
     src/networkservice.h \
     src/issobject.h \
-    src/e621service.h \
-    src/isservice.h
+    src/isservice.h \
+    src/ouroborosservice.h
