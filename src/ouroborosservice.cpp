@@ -1,5 +1,7 @@
 #include "ouroborosservice.h"
 
+#include "isservice.h"
+#include "issobject.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -12,12 +14,15 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QJsonObject>
+
+#include <QStandardPaths>
+#include <QDir>
 
 OuroborosService::OuroborosService(QObject *parent) :
     NetworkService(parent)
 {
-    connect(replyMapper, SIGNAL(mapped(int)),
-                this, SLOT(replyFinish(int)));
+
 }
 
 int OuroborosService::requestImageInfoByTags( QStringList tags, int beforeId )
@@ -31,20 +36,62 @@ int OuroborosService::requestImageInfoByTags( QStringList tags, int beforeId )
     args += "tags=";
     args += tags.join(" ");
 
-    QString address( "https://e621.net/post/index.json?" );
+    QString address( "https://" + m_domain + "/post/index.json?" );
     QNetworkRequest rq( QUrl( address + args ) );
 
-    return addReply( manager->get( rq ) );
-
+    return addReply(
+        new NetworkServiceWork (
+               NetworkServiceWork::Index,
+               m_manager->get(rq),
+               this
+                    ) );
 }
 
-void OuroborosService::replyFinish(int map)
+NetworkServiceWork* OuroborosService::requestImageFile(ISSObject *object, QUrl url)
 {
-    QNetworkReply *r= replies[map];
+    QDir path("/storage/sdcard0/Pictures/"); //QStandardPaths::writableLocation( QStandardPaths::PicturesLocation );
+
+    QString filepath= "./" + m_domain + "/" + object->author() + "/";
+
+    if(!path.exists(filepath)) path.mkpath(filepath);
+
+    if( path.cd(filepath) )
+        qDebug() << "cd to " << path;
+
+    object->setFilePath( path.filePath( url.fileName() ) );
+
+    if( path.exists( url.fileName() ) ) {
+        object->setFileReady(true);
+        return 0;
+    }
+
+    QNetworkRequest rq( url );
+
+    NetworkServiceWork* work = new NetworkServiceWork (
+           NetworkServiceWork::Image,
+           m_manager->get(rq),
+           this
+                );
+
+    work->setIssobject(object);
+
+    addReply( work );
+
+    return work;
+}
+
+void OuroborosService::replyFinished(NetworkServiceWork *work)
+{
+    if( work->type() != NetworkServiceWork::Index )
+    {
+        NetworkService::replyFinished(work);
+        return;
+    }
+
+    QNetworkReply *r= work->reply();
     if( r->error() == QNetworkReply::NoError )
     {
         QByteArray data= r->readAll();
-        qDebug() << " data ready: " << data;
         QJsonDocument doc= QJsonDocument::fromJson( data );
 
         if(doc.isArray())
@@ -53,22 +100,25 @@ void OuroborosService::replyFinish(int map)
             QJsonValue obj;
             Q_FOREACH( obj, arr )
             {
-                QVariant v= obj.toVariant();
-                emit objectReady( map, v.toMap() );
-
+                QJsonObject v= obj.toObject();
+                emit objectReady( work->id(), v.toVariantMap() );
             }
         }
         else
         {
-            QVariant v= doc.toVariant();
-            emit objectReady( map, v.toMap() );
+            QJsonObject v= doc.object();
+            emit objectReady( work->id(), v.toVariantMap() );
         }
     }
     else
     {
-        qDebug() << " REQUEST " << map << " ERROR: " << r->error();
+        qDebug() << " REQUEST " << work->id() << " ERROR: " << r->error();
     }
 
+}
 
+
+OuroborosIndexWork::OuroborosIndexWork(NetworkServiceWork::WorkType type, QNetworkReply *reply, OuroborosService *service):
+    NetworkServiceWork( type, reply, service ){
 
 }

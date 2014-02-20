@@ -32,6 +32,7 @@ public:
                                                  ISService::data_clear );
     }
 
+    Q_INVOKABLE ISSObject *newObject( QString id );
 
     void addObject( ISSObject* obj );
 
